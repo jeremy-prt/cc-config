@@ -40,25 +40,25 @@ cd /Users/jeremy/Documents/code/scripts/claude-config-jeremy
 ### Option 2: NPM Package (recommandé)
 
 ```bash
-npx claude-config-jeremy setup
+npx @jeremyy_prt/cc-config setup
 ```
 
 ou avec bun:
 
 ```bash
-bunx claude-config-jeremy setup
+bunx @jeremyy_prt/cc-config setup
 ```
 
 ### Option 3: Installation manuelle
 
 ```bash
 # Cloner/télécharger le repo
-git clone https://github.com/ton-user/claude-config-jeremy.git
+git clone https://github.com/jeremy-prt/cc-config.git
 
 # Copier les fichiers
-cp -r claude-config-jeremy/commands/* ~/.claude/commands/
-cp -r claude-config-jeremy/agents/* ~/.claude/agents/
-cp -r claude-config-jeremy/scripts/* ~/.claude/scripts/
+cp -r cc-config/commands/* ~/.claude/commands/
+cp -r cc-config/agents/* ~/.claude/agents/
+cp -r cc-config/scripts/* ~/.claude/scripts/
 ```
 
 ## 📦 Prérequis

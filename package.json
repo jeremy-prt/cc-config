@@ -1,10 +1,10 @@
 {
-  "name": "claude-config-jeremy",
+  "name": "@jeremyy_prt/cc-config",
   "version": "1.0.0",
   "description": "Configuration personnalisée pour Claude Code avec commandes et agents en français",
   "main": "index.js",
   "bin": {
-    "claude-config-jeremy": "./cli.js"
+    "cc-config": "./cli.js"
   },
   "scripts": {
     "setup": "node cli.js setup"
@@ -15,13 +15,19 @@
     "config",
     "français",
     "commands",
-    "agents"
+    "agents",
+    "jeremy",
+    "productivity"
   ],
-  "author": "Jeremy",
+  "author": "Jeremy (@jeremyy_prt)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ton-user/claude-config-jeremy.git"
+    "url": "https://github.com/jeremy-prt/cc-config.git"
+  },
+  "homepage": "https://github.com/jeremy-prt/cc-config#readme",
+  "bugs": {
+    "url": "https://github.com/jeremy-prt/cc-config/issues"
   },
   "files": [
     "commands/",
@@ -30,7 +36,6 @@
     "song/",
     "settings.json",
     "cli.js",
-    "index.js",
     "README.md"
   ],
   "engines": {
