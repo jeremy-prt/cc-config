@@ -95,13 +95,14 @@ function installShellAliases() {
     console.log('🔧 Installation des alias shell...');
 
     if (isWindows) {
-      // PowerShell profile
-      const profilePath = path.join(
-        process.env.USERPROFILE,
-        'Documents',
-        'PowerShell',
-        'Microsoft.PowerShell_profile.ps1'
-      );
+      // PowerShell profile - try both locations
+      const possiblePaths = [
+        path.join(process.env.USERPROFILE, 'Documents', 'PowerShell', 'Microsoft.PowerShell_profile.ps1'),
+        path.join(process.env.USERPROFILE, 'Documents', 'WindowsPowerShell', 'Microsoft.PowerShell_profile.ps1')
+      ];
+
+      // Find existing profile or use first path
+      let profilePath = possiblePaths.find(p => fs.existsSync(p)) || possiblePaths[0];
 
       // Create profile directory if it doesn't exist
       const profileDir = path.dirname(profilePath);
@@ -123,10 +124,10 @@ function ccc { claude --dangerously-skip-permissions -c @args }
 
       if (!content.includes('Claude Code aliases')) {
         fs.appendFileSync(profilePath, aliases);
-        console.log('   ✓ Alias PowerShell installés (cc, ccc)');
+        console.log(`   ✓ Alias PowerShell installés dans ${path.basename(profilePath)}`);
         console.log('   → Redémarre PowerShell pour les activer');
       } else {
-        console.log('   ✓ Alias déjà installés');
+        console.log(`   ✓ Alias déjà présents dans ${path.basename(profilePath)}`);
       }
     } else {
       // Unix-like (Mac/Linux)
