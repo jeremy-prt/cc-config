@@ -58,9 +58,16 @@ npx @jeremyy_prt/cc-config setup
 
 ## Config optionnelle
 
-Context7 pour @explorer-docs:
+**Context7** pour @explorer-docs:
 ```bash
 claude mcp add --transport http context7 https://mcp.context7.com/mcp
+```
+
+**Alias shell** pour lancer Claude en bypass:
+```bash
+# Ajouter dans ~/.zshrc ou ~/.bashrc
+alias cc='claude --dangerously-skip-permissions'
+alias ccc='claude --dangerously-skip-permissions -c'
 ```
 
 ## License

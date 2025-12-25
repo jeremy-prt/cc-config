@@ -98,9 +98,12 @@ function installStatuslineDeps() {
   try {
     console.log('📦 Installation des dépendances statusline...');
 
+    const isWindows = process.platform === 'win32';
+
     // Vérifier si bun est disponible
     try {
-      execSync('which bun', { stdio: 'ignore' });
+      const bunCheck = isWindows ? 'where bun' : 'which bun';
+      execSync(bunCheck, { stdio: 'ignore' });
       execSync('bun install', {
         cwd: statuslineDir,
         stdio: 'ignore'
@@ -122,6 +125,8 @@ function installStatuslineDeps() {
 function listInstalled() {
   const commandsDir = path.join(CLAUDE_DIR, 'commands');
   const agentsDir = path.join(CLAUDE_DIR, 'agents');
+  const settingsFile = path.join(CLAUDE_DIR, 'settings.json');
+  const statuslineDir = path.join(CLAUDE_DIR, 'scripts', 'statusline');
 
   console.log('\n📋 Commandes installées:');
   if (fs.existsSync(commandsDir)) {
@@ -137,6 +142,14 @@ function listInstalled() {
       .filter(f => f.endsWith('.md'))
       .map(f => f.replace('.md', ''));
     agents.forEach(agent => console.log(`   - @${agent}`));
+  }
+
+  console.log('\n⚙️  Configuration:');
+  if (fs.existsSync(settingsFile)) {
+    console.log('   ✓ Hooks installés (PreToolUse, Stop, Notification)');
+  }
+  if (fs.existsSync(statuslineDir)) {
+    console.log('   ✓ Statusline configurée');
   }
 }
 
