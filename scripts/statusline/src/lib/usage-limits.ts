@@ -55,17 +55,29 @@ interface Credentials {
 
 export async function getCredentials(): Promise<string | null> {
 	try {
-		// Cette commande ne fonctionne que sur macOS
-		// Sur Windows, retourner null (la statusline affichera sans les limites)
-		if (process.platform !== "darwin") {
+		// Sur macOS : utiliser le Keychain
+		if (process.platform === "darwin") {
+			const result = execSync(
+				'security find-generic-password -s "Claude Code-credentials" -w',
+				{ encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] },
+			);
+			const creds: Credentials = JSON.parse(result.trim());
+			return creds.claudeAiOauth.accessToken;
+		}
+
+		// Sur Windows/Linux : lire ~/.claude/.credentials.json
+		const credentialsPath = join(
+			process.env.HOME || process.env.USERPROFILE || "",
+			".claude",
+			".credentials.json",
+		);
+
+		if (!existsSync(credentialsPath)) {
 			return null;
 		}
 
-		const result = execSync(
-			'security find-generic-password -s "Claude Code-credentials" -w',
-			{ encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] },
-		);
-		const creds: Credentials = JSON.parse(result.trim());
+		const credentialsContent = await readFile(credentialsPath, "utf-8");
+		const creds: Credentials = JSON.parse(credentialsContent);
 		return creds.claudeAiOauth.accessToken;
 	} catch {
 		return null;
@@ -145,11 +157,6 @@ async function saveCache(data: UsageLimits): Promise<void> {
 
 export async function getUsageLimits(): Promise<UsageLimits> {
 	try {
-		// Sur Windows, pas de credentials disponibles
-		if (process.platform !== "darwin") {
-			return { five_hour: null, seven_day: null };
-		}
-
 		// Try to load from cache first
 		const cached = await loadCache();
 		if (cached) {
