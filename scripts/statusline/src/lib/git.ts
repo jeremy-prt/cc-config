@@ -1,4 +1,4 @@
-import { $ } from "bun";
+import { execSync } from "node:child_process";
 
 export interface GitStatus {
 	branch: string;
@@ -15,9 +15,24 @@ export interface GitStatus {
 	};
 }
 
+function exec(command: string): { stdout: string; exitCode: number } {
+	try {
+		const stdout = execSync(command, {
+			encoding: "utf-8",
+			stdio: ["pipe", "pipe", "pipe"],
+		});
+		return { stdout, exitCode: 0 };
+	} catch (error: any) {
+		return {
+			stdout: error.stdout?.toString() || "",
+			exitCode: error.status || 1,
+		};
+	}
+}
+
 export async function getGitStatus(): Promise<GitStatus> {
 	try {
-		const isGitRepo = await $`git rev-parse --git-dir`.quiet().nothrow();
+		const isGitRepo = exec("git rev-parse --git-dir");
 		if (isGitRepo.exitCode !== 0) {
 			return {
 				branch: "no-git",
@@ -27,21 +42,17 @@ export async function getGitStatus(): Promise<GitStatus> {
 			};
 		}
 
-		const branchResult = await $`git branch --show-current`.quiet().text();
-		const branch = branchResult.trim() || "detached";
+		const branchResult = exec("git branch --show-current");
+		const branch = branchResult.stdout.trim() || "detached";
 
-		const diffCheck = await $`git diff-index --quiet HEAD --`.quiet().nothrow();
-		const cachedCheck = await $`git diff-index --quiet --cached HEAD --`
-			.quiet()
-			.nothrow();
+		const diffCheck = exec("git diff-index --quiet HEAD --");
+		const cachedCheck = exec("git diff-index --quiet --cached HEAD --");
 
 		if (diffCheck.exitCode !== 0 || cachedCheck.exitCode !== 0) {
-			const unstagedDiff = await $`git diff --numstat`.quiet().text();
-			const stagedDiff = await $`git diff --cached --numstat`.quiet().text();
-			const stagedFilesResult = await $`git diff --cached --name-only`
-				.quiet()
-				.text();
-			const unstagedFilesResult = await $`git diff --name-only`.quiet().text();
+			const unstagedDiff = exec("git diff --numstat").stdout;
+			const stagedDiff = exec("git diff --cached --numstat").stdout;
+			const stagedFilesResult = exec("git diff --cached --name-only").stdout;
+			const unstagedFilesResult = exec("git diff --name-only").stdout;
 
 			const parseStats = (diff: string) => {
 				let added = 0;

@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { $ } from "bun";
+import { execSync } from "node:child_process";
 
 export interface UsageLimits {
 	five_hour: {
@@ -22,7 +22,8 @@ interface CachedUsageLimits {
 const CACHE_DURATION_MS = 60 * 1000; // 1 minute
 
 function getCacheFilePath(): string {
-	const projectRoot = join(import.meta.dir, "..", "..");
+	// Utiliser __dirname pour Node.js au lieu de import.meta.dir (Bun)
+	const projectRoot = join(__dirname, "..", "..");
 	return join(projectRoot, "data", "usage-limits-cache.json");
 }
 
@@ -38,10 +39,16 @@ interface Credentials {
 
 export async function getCredentials(): Promise<string | null> {
 	try {
-		const result =
-			await $`security find-generic-password -s "Claude Code-credentials" -w`
-				.quiet()
-				.text();
+		// Cette commande ne fonctionne que sur macOS
+		// Sur Windows, retourner null (la statusline affichera sans les limites)
+		if (process.platform !== "darwin") {
+			return null;
+		}
+
+		const result = execSync(
+			'security find-generic-password -s "Claude Code-credentials" -w',
+			{ encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] },
+		);
 		const creds: Credentials = JSON.parse(result.trim());
 		return creds.claudeAiOauth.accessToken;
 	} catch {
