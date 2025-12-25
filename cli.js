@@ -91,79 +91,96 @@ function mergeSettings() {
 function installShellAliases() {
   const isWindows = process.platform === 'win32';
 
-  try {
-    console.log('🔧 Installation des alias shell...');
+  console.log('🔧 Installation des alias shell...');
 
-    if (isWindows) {
-      // PowerShell profile - try both locations
-      const possiblePaths = [
-        path.join(process.env.USERPROFILE, 'Documents', 'PowerShell', 'Microsoft.PowerShell_profile.ps1'),
-        path.join(process.env.USERPROFILE, 'Documents', 'WindowsPowerShell', 'Microsoft.PowerShell_profile.ps1')
-      ];
+  if (isWindows) {
+    // PowerShell profiles - install in both locations
+    const profilePaths = [
+      path.join(process.env.USERPROFILE, 'Documents', 'WindowsPowerShell', 'Microsoft.PowerShell_profile.ps1'), // PowerShell 5.1
+      path.join(process.env.USERPROFILE, 'Documents', 'PowerShell', 'Microsoft.PowerShell_profile.ps1') // PowerShell 7+
+    ];
 
-      // Find existing profile or use first path
-      let profilePath = possiblePaths.find(p => fs.existsSync(p)) || possiblePaths[0];
-
-      // Create profile directory if it doesn't exist
-      const profileDir = path.dirname(profilePath);
-      if (!fs.existsSync(profileDir)) {
-        fs.mkdirSync(profileDir, { recursive: true });
-      }
-
-      const aliases = `
+    const aliases = `
 # Claude Code aliases
 function cc { claude --dangerously-skip-permissions @args }
 function ccc { claude --dangerously-skip-permissions -c @args }
 `;
 
-      // Check if aliases already exist
-      let content = '';
-      if (fs.existsSync(profilePath)) {
-        content = fs.readFileSync(profilePath, 'utf8');
-      }
+    let installed = false;
+    let alreadyExists = false;
 
-      if (!content.includes('Claude Code aliases')) {
-        fs.appendFileSync(profilePath, aliases);
-        console.log(`   ✓ Alias PowerShell installés dans ${path.basename(profilePath)}`);
-        console.log('   → Redémarre PowerShell pour les activer');
-      } else {
-        console.log(`   ✓ Alias déjà présents dans ${path.basename(profilePath)}`);
-      }
-    } else {
-      // Unix-like (Mac/Linux)
-      const homeDir = os.homedir();
-      const shellFiles = [
-        path.join(homeDir, '.zshrc'),
-        path.join(homeDir, '.bashrc')
-      ];
+    for (const profilePath of profilePaths) {
+      try {
+        const profileDir = path.dirname(profilePath);
+        const profileName = path.basename(path.dirname(profilePath));
 
-      const aliases = `
+        // Create profile directory if it doesn't exist
+        if (!fs.existsSync(profileDir)) {
+          fs.mkdirSync(profileDir, { recursive: true });
+          console.log(`   📁 Dossier créé: ${profileName}`);
+        }
+
+        // Check if aliases already exist
+        let content = '';
+        if (fs.existsSync(profilePath)) {
+          content = fs.readFileSync(profilePath, 'utf8');
+        }
+
+        if (!content.includes('Claude Code aliases')) {
+          fs.appendFileSync(profilePath, aliases);
+
+          // Verify it was written
+          if (fs.existsSync(profilePath)) {
+            console.log(`   ✓ Alias installés dans ${profileName}`);
+            installed = true;
+          } else {
+            console.log(`   ⚠️  Échec création profil ${profileName}`);
+          }
+        } else {
+          alreadyExists = true;
+        }
+      } catch (error) {
+        console.log(`   ⚠️  Erreur ${path.basename(path.dirname(profilePath))}: ${error.message}`);
+      }
+    }
+
+    if (installed) {
+      console.log('   → Redémarre PowerShell pour les activer');
+    } else if (alreadyExists) {
+      console.log('   ✓ Alias déjà présents');
+    }
+  } else {
+    // Unix-like (Mac/Linux)
+    const homeDir = os.homedir();
+    const shellFiles = [
+      path.join(homeDir, '.zshrc'),
+      path.join(homeDir, '.bashrc')
+    ];
+
+    const aliases = `
 # Claude Code aliases
 alias cc='claude --dangerously-skip-permissions'
 alias ccc='claude --dangerously-skip-permissions -c'
 `;
 
-      let installed = false;
-      for (const shellFile of shellFiles) {
-        if (fs.existsSync(shellFile)) {
-          let content = fs.readFileSync(shellFile, 'utf8');
+    let installed = false;
+    for (const shellFile of shellFiles) {
+      if (fs.existsSync(shellFile)) {
+        let content = fs.readFileSync(shellFile, 'utf8');
 
-          if (!content.includes('Claude Code aliases')) {
-            fs.appendFileSync(shellFile, aliases);
-            console.log(`   ✓ Alias installés dans ${path.basename(shellFile)}`);
-            installed = true;
-          }
+        if (!content.includes('Claude Code aliases')) {
+          fs.appendFileSync(shellFile, aliases);
+          console.log(`   ✓ Alias installés dans ${path.basename(shellFile)}`);
+          installed = true;
         }
       }
-
-      if (installed) {
-        console.log('   → Redémarre ton terminal pour les activer');
-      } else {
-        console.log('   ✓ Alias déjà installés');
-      }
     }
-  } catch (error) {
-    console.log('   ⚠️  Impossible d\'installer les alias');
+
+    if (installed) {
+      console.log('   → Redémarre ton terminal pour les activer');
+    } else {
+      console.log('   ✓ Alias déjà installés');
+    }
   }
 }
 
