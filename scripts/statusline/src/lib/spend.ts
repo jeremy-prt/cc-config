@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { HookInput } from "./types";
 
 export interface SpendSession {
@@ -19,7 +20,9 @@ export interface SpendData {
 
 export function getSpendFilePath(): string {
 	// Use the project's data folder instead of ~/.claude
-	const projectRoot = join(import.meta.dir, "..", "..");
+	const __filename = fileURLToPath(import.meta.url);
+	const __dirname = dirname(__filename);
+	const projectRoot = join(__dirname, "..", "..");
 	return join(projectRoot, "data", "spend.json");
 }
 
@@ -40,7 +43,9 @@ export async function loadSpendData(): Promise<SpendData> {
 
 export async function saveSpendData(data: SpendData): Promise<void> {
 	const spendFile = getSpendFilePath();
-	const projectRoot = join(import.meta.dir, "..", "..");
+	const __filename = fileURLToPath(import.meta.url);
+	const __dirname = dirname(__filename);
+	const projectRoot = join(__dirname, "..", "..");
 	const dataDir = join(projectRoot, "data");
 
 	if (!existsSync(dataDir)) {
