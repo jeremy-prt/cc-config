@@ -76,16 +76,13 @@ function mergeSettings() {
 
   console.log('⚙️  Configuration des settings...');
 
-  // Lire et adapter le settings.json selon la plateforme
+  // Lire le settings.json et remplacer les variables
   let settingsContent = fs.readFileSync(srcSettings, 'utf-8');
 
-  // Remplacer le wrapper selon la plateforme
-  const isWindows = process.platform === 'win32';
-  const wrapperFile = isWindows ? 'statusline-wrapper.cmd' : 'statusline-wrapper.sh';
-  settingsContent = settingsContent.replace(
-    /statusline-wrapper\.(cmd|sh)/g,
-    wrapperFile
-  );
+  // Remplacer ${CLAUDE_CONFIG_DIR} par le chemin absolu
+  // Utiliser des forward slashes (compatible Windows et Unix)
+  const claudeDir = CLAUDE_DIR.replace(/\\/g, '/');
+  settingsContent = settingsContent.replace(/\$\{CLAUDE_CONFIG_DIR\}/g, claudeDir);
 
   if (fs.existsSync(destSettings)) {
     console.log('   ⚠️  settings.json existe déjà');
