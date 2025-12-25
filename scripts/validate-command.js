@@ -688,6 +688,32 @@ async function main() {
       console.log("Command validation passed");
       process.exit(0); // Allow execution
     } else {
+      // Play alert sound for dangerous command
+      try {
+        const { execSync } = require('child_process');
+        const os = require('os');
+        const homeDir = os.homedir();
+        const soundPath = require('path').join(homeDir, '.claude', 'song', 'need-human.mp3');
+
+        // Cross-platform sound playback
+        if (os.platform() === 'darwin') {
+          // macOS: use afplay
+          execSync(`afplay "${soundPath}"`, { stdio: 'ignore', timeout: 3000 });
+        } else if (os.platform() === 'win32') {
+          // Windows: use PowerShell MediaPlayer
+          execSync(`powershell -c "Add-Type -AssemblyName presentationCore; $player = New-Object System.Windows.Media.MediaPlayer; $player.Open('${soundPath.replace(/\\/g, '\\\\')}'); $player.Play(); Start-Sleep -Milliseconds 1500"`, { stdio: 'ignore', timeout: 3000 });
+        } else {
+          // Linux: use mpg123 or ffplay if available
+          try {
+            execSync(`mpg123 -q "${soundPath}"`, { stdio: 'ignore', timeout: 3000 });
+          } catch {
+            execSync(`ffplay -nodisp -autoexit -loglevel quiet "${soundPath}"`, { stdio: 'ignore', timeout: 3000 });
+          }
+        }
+      } catch (error) {
+        // Ignore sound errors - continue with security prompt
+      }
+
       // Instead of blocking, ask user for confirmation
       const confirmationMessage = `⚠️  Potentially dangerous command detected!\n\nCommand: ${command}\nViolations: ${result.violations.join(
         ", "

@@ -10,6 +10,16 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_CONFIG_DIR}/scripts/play-finish-sound.js"
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
