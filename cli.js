@@ -76,14 +76,25 @@ function mergeSettings() {
 
   console.log('⚙️  Configuration des settings...');
 
+  // Lire et adapter le settings.json selon la plateforme
+  let settingsContent = fs.readFileSync(srcSettings, 'utf-8');
+
+  // Remplacer le wrapper selon la plateforme
+  const isWindows = process.platform === 'win32';
+  const wrapperFile = isWindows ? 'statusline-wrapper.cmd' : 'statusline-wrapper.sh';
+  settingsContent = settingsContent.replace(
+    /statusline-wrapper\.(cmd|sh)/g,
+    wrapperFile
+  );
+
   if (fs.existsSync(destSettings)) {
     console.log('   ⚠️  settings.json existe déjà');
     const examplePath = path.join(CLAUDE_DIR, 'settings.example.json');
-    fs.copyFileSync(srcSettings, examplePath);
+    fs.writeFileSync(examplePath, settingsContent);
     console.log(`   → Copié vers settings.example.json`);
     console.log('   → Merge manuel recommandé');
   } else {
-    fs.copyFileSync(srcSettings, destSettings);
+    fs.writeFileSync(destSettings, settingsContent);
     console.log('   ✓ settings.json installé');
   }
 }
@@ -302,6 +313,18 @@ function setup() {
 
   // Installer dépendances statusline
   installStatuslineDeps();
+
+  // Rendre le wrapper statusline exécutable sur Mac/Linux
+  if (process.platform !== 'win32') {
+    try {
+      const wrapperPath = path.join(CLAUDE_DIR, 'scripts', 'statusline-wrapper.sh');
+      if (fs.existsSync(wrapperPath)) {
+        execSync(`chmod +x "${wrapperPath}"`, { stdio: 'ignore' });
+      }
+    } catch (err) {
+      // Ignore errors
+    }
+  }
 
   // Afficher résumé
   listInstalled();
