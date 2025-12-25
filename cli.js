@@ -88,6 +88,84 @@ function mergeSettings() {
   }
 }
 
+function installShellAliases() {
+  const isWindows = process.platform === 'win32';
+
+  try {
+    console.log('🔧 Installation des alias shell...');
+
+    if (isWindows) {
+      // PowerShell profile
+      const profilePath = path.join(
+        process.env.USERPROFILE,
+        'Documents',
+        'PowerShell',
+        'Microsoft.PowerShell_profile.ps1'
+      );
+
+      // Create profile directory if it doesn't exist
+      const profileDir = path.dirname(profilePath);
+      if (!fs.existsSync(profileDir)) {
+        fs.mkdirSync(profileDir, { recursive: true });
+      }
+
+      const aliases = `
+# Claude Code aliases
+function cc { claude --dangerously-skip-permissions @args }
+function ccc { claude --dangerously-skip-permissions -c @args }
+`;
+
+      // Check if aliases already exist
+      let content = '';
+      if (fs.existsSync(profilePath)) {
+        content = fs.readFileSync(profilePath, 'utf8');
+      }
+
+      if (!content.includes('Claude Code aliases')) {
+        fs.appendFileSync(profilePath, aliases);
+        console.log('   ✓ Alias PowerShell installés (cc, ccc)');
+        console.log('   → Redémarre PowerShell pour les activer');
+      } else {
+        console.log('   ✓ Alias déjà installés');
+      }
+    } else {
+      // Unix-like (Mac/Linux)
+      const homeDir = os.homedir();
+      const shellFiles = [
+        path.join(homeDir, '.zshrc'),
+        path.join(homeDir, '.bashrc')
+      ];
+
+      const aliases = `
+# Claude Code aliases
+alias cc='claude --dangerously-skip-permissions'
+alias ccc='claude --dangerously-skip-permissions -c'
+`;
+
+      let installed = false;
+      for (const shellFile of shellFiles) {
+        if (fs.existsSync(shellFile)) {
+          let content = fs.readFileSync(shellFile, 'utf8');
+
+          if (!content.includes('Claude Code aliases')) {
+            fs.appendFileSync(shellFile, aliases);
+            console.log(`   ✓ Alias installés dans ${path.basename(shellFile)}`);
+            installed = true;
+          }
+        }
+      }
+
+      if (installed) {
+        console.log('   → Redémarre ton terminal pour les activer');
+      } else {
+        console.log('   ✓ Alias déjà installés');
+      }
+    }
+  } catch (error) {
+    console.log('   ⚠️  Impossible d\'installer les alias');
+  }
+}
+
 function installStatuslineDeps() {
   const statuslineDir = path.join(CLAUDE_DIR, 'scripts', 'statusline');
 
@@ -200,6 +278,9 @@ function setup() {
 
   // Merger settings
   mergeSettings();
+
+  // Installer alias shell
+  installShellAliases();
 
   // Installer dépendances statusline
   installStatuslineDeps();
