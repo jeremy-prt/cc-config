@@ -1,0 +1,39 @@
+{
+  "name": "claude-config-jeremy",
+  "version": "1.0.0",
+  "description": "Configuration personnalisée pour Claude Code avec commandes et agents en français",
+  "main": "index.js",
+  "bin": {
+    "claude-config-jeremy": "./cli.js"
+  },
+  "scripts": {
+    "setup": "node cli.js setup"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "config",
+    "français",
+    "commands",
+    "agents"
+  ],
+  "author": "Jeremy",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ton-user/claude-config-jeremy.git"
+  },
+  "files": [
+    "commands/",
+    "agents/",
+    "scripts/",
+    "song/",
+    "settings.json",
+    "cli.js",
+    "index.js",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

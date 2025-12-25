@@ -1,0 +1,6 @@
+node_modules/
+.DS_Store
+*.log
+*.backup.*
+scripts/statusline/node_modules/
+scripts/statusline/data/
