@@ -1,159 +1,68 @@
-# Claude Config Jeremy
+# CC Config
 
-Configuration personnalisée pour Claude Code avec commandes, agents et scripts en français.
+Config Claude Code en français avec commandes, agents et scripts.
 
-## ✨ Features
+## Installation
 
-### 📝 Commandes (7)
-- `/commit` - Commits conventionnels rapides avec push automatique
-- `/corriger-orthographe` - Correction grammaticale et orthographique
-- `/creer-agent` - Créer et optimiser des agents personnalisés
-- `/creer-commande` - Créer et optimiser des commandes
-- `/liste-commande` - Liste toutes les commandes et agents avec exemples
-- `/memoire-claude` - Créer et mettre à jour les fichiers CLAUDE.md
-- `/surveiller-ci` - Surveiller et corriger automatiquement les erreurs de CI GitHub Actions
-
-### 🤖 Agents (4)
-- `@corriger-orthographe` - Correction orthographique de fichiers
-- `@explorer-code` - Exploration de codebase
-- `@explorer-docs` - Exploration de documentation avec Context7
-- `@recherche-web` - Recherche web rapide
-
-### 🔒 Sécurité
-- Hook PreToolUse avec validation des commandes bash (700+ lignes)
-- Bloque les commandes dangereuses (`rm -rf /`, `sudo`, etc.)
-
-### 🎨 Autres
-- Statusline personnalisée avec Git et tracking des coûts
-- Sons de notification (finish, need-human)
-- Hooks configurés (PreToolUse, Stop, Notification)
-
-## 🚀 Installation
-
-### Option 1: Script Shell (local)
-
-```bash
-cd /Users/jeremy/Documents/code/scripts/claude-config-jeremy
-./install.sh
-```
-
-### Option 2: NPM Package (recommandé)
+**Prérequis:** [Claude Code](https://claude.ai/download) installé
 
 ```bash
 npx @jeremyy_prt/cc-config setup
 ```
 
-ou avec bun:
+⚠️ **Important:** Ne pas utiliser `npm install`, utiliser `npx` avec `setup`
+
+## Contenu
+
+**7 Commandes:**
+- `/commit` - Commits rapides avec push auto
+- `/corriger-orthographe` - Correction grammaire/orthographe
+- `/creer-agent` - Créer des agents
+- `/creer-commande` - Créer des commandes
+- `/liste-commande` - Lister tout avec exemples
+- `/memoire-claude` - Gérer les fichiers CLAUDE.md
+- `/surveiller-ci` - Auto-fix des erreurs CI
+
+**4 Agents:**
+- `@corriger-orthographe` - Correction de fichiers
+- `@explorer-code` - Explorer le code
+- `@explorer-docs` - Explorer la doc
+- `@recherche-web` - Recherche web
+
+**Sécurité:**
+- Hook de validation bash (bloque `rm -rf /`, `sudo`, etc.)
+
+**Bonus:**
+- Statusline avec Git et coûts
+- Sons de notification
+- Hooks configurés
+
+## Exemples
 
 ```bash
-bunx @jeremyy_prt/cc-config setup
+# Commit rapide
+/commit
+
+# Corriger fichier
+/corriger-orthographe src/app.vue
+
+# Explorer doc
+@explorer-docs cherche Nuxt 4
+
+# Surveiller CI
+/surveiller-ci
+
+# Lister tout
+/liste-commande --exemples
 ```
 
-### Option 3: Installation manuelle
+## Config optionnelle
 
-```bash
-# Cloner/télécharger le repo
-git clone https://github.com/jeremy-prt/cc-config.git
-
-# Copier les fichiers
-cp -r cc-config/commands/* ~/.claude/commands/
-cp -r cc-config/agents/* ~/.claude/agents/
-cp -r cc-config/scripts/* ~/.claude/scripts/
-```
-
-## 📦 Prérequis
-
-- [Claude Code](https://claude.ai/download) installé
-- `bun` (optionnel, pour statusline)
-- `gh` CLI (optionnel, pour /surveiller-ci)
-
-## 🔧 Configuration
-
-### Context7 MCP (recommandé pour @explorer-docs)
-
+Context7 pour @explorer-docs:
 ```bash
 claude mcp add --transport http context7 https://mcp.context7.com/mcp
 ```
 
-Ou avec API key:
-```bash
-claude mcp add --transport http context7 https://mcp.context7.com/mcp \
-  --header "CONTEXT7_API_KEY: ta_clé"
-```
-
-## 📚 Exemples d'utilisation
-
-### Commits rapides
-```bash
-/commit
-```
-
-### Corriger l'orthographe
-```bash
-/corriger-orthographe src/components/Header.vue
-/corriger-orthographe src/**/*.vue
-```
-
-### Explorer la documentation
-```bash
-@explorer-docs cherche la doc de Nuxt 4
-```
-ou en conversationnel:
-```
-Comment utiliser les server routes dans Vue 3 ?
-```
-
-### Surveiller le CI
-```bash
-/surveiller-ci
-```
-
-### Créer une commande personnalisée
-```bash
-/creer-commande create deploy
-```
-
-### Lister toutes les commandes avec exemples
-```bash
-/liste-commande --exemples
-```
-
-## 🗂️ Structure
-
-```
-claude-config-jeremy/
-├── commands/           # Commandes slash personnalisées
-│   ├── commit.md
-│   ├── corriger-orthographe.md
-│   ├── creer-agent.md
-│   ├── creer-commande.md
-│   ├── liste-commande.md
-│   ├── memoire-claude.md
-│   └── surveiller-ci.md
-├── agents/            # Agents spécialisés
-│   ├── corriger-orthographe.md
-│   ├── explorer-code.md
-│   ├── explorer-docs.md
-│   └── recherche-web.md
-├── scripts/           # Scripts utilitaires
-│   ├── validate-command.js
-│   └── statusline/
-├── song/              # Sons de notification
-│   ├── finish.mp3
-│   └── need-human.mp3
-├── settings.json      # Configuration des hooks et statusline
-├── install.sh         # Script d'installation shell
-└── README.md
-```
-
-## 🤝 Contribution
-
-N'hésite pas à proposer des améliorations ou de nouvelles commandes!
-
-## 📝 License
+## License
 
 MIT
-
-## 🙏 Crédits
-
-Inspiré par [AIBlueprint](https://github.com/Melvynx/aiblueprint) de Melvynx
