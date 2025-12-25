@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 
 import type { StatuslineConfig } from "../statusline.config";
 import { defaultConfig } from "../statusline.config";
@@ -17,6 +17,21 @@ import { getGitStatus } from "./lib/git";
 import { saveSession } from "./lib/spend";
 import type { HookInput } from "./lib/types";
 import { getUsageLimits } from "./lib/usage-limits";
+
+// Fonction pour lire stdin de manière compatible Node.js et Bun
+async function getStdin(): Promise<string> {
+	// Si Bun est disponible, utiliser Bun.stdin
+	if (typeof Bun !== "undefined") {
+		return await Bun.stdin.text();
+	}
+
+	// Sinon, utiliser process.stdin (Node.js)
+	const chunks: Buffer[] = [];
+	for await (const chunk of process.stdin) {
+		chunks.push(chunk as Buffer);
+	}
+	return Buffer.concat(chunks).toString("utf-8");
+}
 
 function buildFirstLine(
 	branch: string,
@@ -122,7 +137,8 @@ function buildThirdLine(
 
 async function main() {
 	try {
-		const input: HookInput = await Bun.stdin.json();
+		const stdinData = await getStdin();
+		const input: HookInput = JSON.parse(stdinData);
 
 		await saveSession(input);
 

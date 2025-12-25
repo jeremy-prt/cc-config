@@ -14,7 +14,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "node ${CLAUDE_CONFIG_DIR}/scripts/statusline/src/index.ts",
+    "command": "npx tsx ${CLAUDE_CONFIG_DIR}/scripts/statusline/src/index.ts",
     "padding": 0
   }
 }
