@@ -22,12 +22,25 @@ interface CachedUsageLimits {
 
 const CACHE_DURATION_MS = 60 * 1000; // 1 minute
 
-function getCacheFilePath(): string {
-	// Utiliser import.meta.url pour ESM (compatible Node.js et Bun)
-	const __filename = fileURLToPath(import.meta.url);
-	const __dirname = dirname(__filename);
-	const projectRoot = join(__dirname, "..", "..");
-	return join(projectRoot, "data", "usage-limits-cache.json");
+function getCacheFilePath(): string | null {
+	try {
+		// Utiliser import.meta.url pour ESM (compatible Node.js et Bun)
+		const __filename = fileURLToPath(import.meta.url);
+		const __dirname = dirname(__filename);
+		const projectRoot = join(__dirname, "..", "..");
+		const cacheDir = join(projectRoot, "data");
+
+		// Créer le dossier data s'il n'existe pas
+		if (!existsSync(cacheDir)) {
+			const { mkdirSync } = require("node:fs");
+			mkdirSync(cacheDir, { recursive: true });
+		}
+
+		return join(cacheDir, "usage-limits-cache.json");
+	} catch {
+		// Si erreur, désactiver le cache
+		return null;
+	}
 }
 
 interface Credentials {
@@ -93,7 +106,7 @@ export async function fetchUsageLimits(
 async function loadCache(): Promise<CachedUsageLimits | null> {
 	try {
 		const cacheFile = getCacheFilePath();
-		if (!existsSync(cacheFile)) {
+		if (!cacheFile || !existsSync(cacheFile)) {
 			return null;
 		}
 
@@ -115,6 +128,10 @@ async function loadCache(): Promise<CachedUsageLimits | null> {
 async function saveCache(data: UsageLimits): Promise<void> {
 	try {
 		const cacheFile = getCacheFilePath();
+		if (!cacheFile) {
+			return;
+		}
+
 		const cached: CachedUsageLimits = {
 			data,
 			timestamp: Date.now(),
@@ -128,6 +145,11 @@ async function saveCache(data: UsageLimits): Promise<void> {
 
 export async function getUsageLimits(): Promise<UsageLimits> {
 	try {
+		// Sur Windows, pas de credentials disponibles
+		if (process.platform !== "darwin") {
+			return { five_hour: null, seven_day: null };
+		}
+
 		// Try to load from cache first
 		const cached = await loadCache();
 		if (cached) {
