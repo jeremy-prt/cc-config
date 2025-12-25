@@ -14,7 +14,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "npx tsx ${CLAUDE_CONFIG_DIR}/scripts/statusline/src/index.ts",
+    "command": "${CLAUDE_CONFIG_DIR}/scripts/statusline-wrapper.cmd",
     "padding": 0
   }
 }

@@ -142,7 +142,7 @@ async function main() {
 
 		await saveSession(input);
 
-		const git = await getGitStatus();
+		const git = await getGitStatus(input.workspace.current_dir);
 		const branch = formatBranch(git, defaultConfig.git);
 		const dirPath = formatPath(
 			input.workspace.current_dir,

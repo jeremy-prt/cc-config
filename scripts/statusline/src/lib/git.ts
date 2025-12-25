@@ -15,11 +15,12 @@ export interface GitStatus {
 	};
 }
 
-function exec(command: string): { stdout: string; exitCode: number } {
+function exec(command: string, cwd?: string): { stdout: string; exitCode: number } {
 	try {
 		const stdout = execSync(command, {
 			encoding: "utf-8",
 			stdio: ["pipe", "pipe", "pipe"],
+			cwd: cwd || process.cwd(),
 		});
 		return { stdout, exitCode: 0 };
 	} catch (error: any) {
@@ -30,9 +31,9 @@ function exec(command: string): { stdout: string; exitCode: number } {
 	}
 }
 
-export async function getGitStatus(): Promise<GitStatus> {
+export async function getGitStatus(cwd?: string): Promise<GitStatus> {
 	try {
-		const isGitRepo = exec("git rev-parse --git-dir");
+		const isGitRepo = exec("git rev-parse --git-dir", cwd);
 		if (isGitRepo.exitCode !== 0) {
 			return {
 				branch: "no-git",
@@ -42,17 +43,17 @@ export async function getGitStatus(): Promise<GitStatus> {
 			};
 		}
 
-		const branchResult = exec("git branch --show-current");
+		const branchResult = exec("git branch --show-current", cwd);
 		const branch = branchResult.stdout.trim() || "detached";
 
-		const diffCheck = exec("git diff-index --quiet HEAD --");
-		const cachedCheck = exec("git diff-index --quiet --cached HEAD --");
+		const diffCheck = exec("git diff-index --quiet HEAD --", cwd);
+		const cachedCheck = exec("git diff-index --quiet --cached HEAD --", cwd);
 
 		if (diffCheck.exitCode !== 0 || cachedCheck.exitCode !== 0) {
-			const unstagedDiff = exec("git diff --numstat").stdout;
-			const stagedDiff = exec("git diff --cached --numstat").stdout;
-			const stagedFilesResult = exec("git diff --cached --name-only").stdout;
-			const unstagedFilesResult = exec("git diff --name-only").stdout;
+			const unstagedDiff = exec("git diff --numstat", cwd).stdout;
+			const stagedDiff = exec("git diff --cached --numstat", cwd).stdout;
+			const stagedFilesResult = exec("git diff --cached --name-only", cwd).stdout;
+			const unstagedFilesResult = exec("git diff --name-only", cwd).stdout;
 
 			const parseStats = (diff: string) => {
 				let added = 0;

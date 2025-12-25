@@ -1,7 +1,8 @@
 import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { execSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 export interface UsageLimits {
 	five_hour: {
@@ -22,7 +23,9 @@ interface CachedUsageLimits {
 const CACHE_DURATION_MS = 60 * 1000; // 1 minute
 
 function getCacheFilePath(): string {
-	// Utiliser __dirname pour Node.js au lieu de import.meta.dir (Bun)
+	// Utiliser import.meta.url pour ESM (compatible Node.js et Bun)
+	const __filename = fileURLToPath(import.meta.url);
+	const __dirname = dirname(__filename);
 	const projectRoot = join(__dirname, "..", "..");
 	return join(projectRoot, "data", "usage-limits-cache.json");
 }

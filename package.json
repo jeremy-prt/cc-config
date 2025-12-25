@@ -1,6 +1,6 @@
 {
   "name": "@jeremyy_prt/cc-config",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Configuration personnalisée pour Claude Code avec commandes et agents en français",
   "main": "index.js",
   "bin": {
