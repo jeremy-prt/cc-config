@@ -32,8 +32,13 @@ npx @jeremyy_prt/cc-config setup
 **Sécurité:**
 - Hook de validation bash (bloque `rm -rf /`, `sudo`, etc.)
 
+**Statusline:**
+- Branche Git avec modifications (`main*`)
+- Contexte utilisé (`23%`)
+- Limites d'usage (`Session: 45%`)
+- Compatible **Mac ET Windows** ✅
+
 **Bonus:**
-- Statusline avec Git et coûts
 - Sons de notification
 - Hooks configurés
 

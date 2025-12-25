@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 
 export interface TokenUsage {
   input_tokens: number;
@@ -23,7 +24,7 @@ export async function getContextLength(
   transcriptPath: string,
 ): Promise<number> {
   try {
-    const content = await Bun.file(transcriptPath).text();
+    const content = await readFile(transcriptPath, "utf-8");
     const lines = content.trim().split("\n");
 
     if (lines.length === 0) return 0;
