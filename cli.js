@@ -145,7 +145,9 @@ function setup() {
 
   // Vérifier que Claude Code est installé
   try {
-    execSync('which claude', { stdio: 'ignore' });
+    const isWindows = process.platform === 'win32';
+    const command = isWindows ? 'where claude' : 'which claude';
+    execSync(command, { stdio: 'ignore' });
   } catch {
     console.error('⚠️  Claude Code n\'est pas installé.');
     console.error('   Installe-le d\'abord: https://claude.ai/download');
