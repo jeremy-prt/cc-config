@@ -4,7 +4,7 @@
   "description": "Configuration personnalisée pour Claude Code avec commandes et agents en français",
   "main": "index.js",
   "bin": {
-    "cc-config": "./cli.js"
+    "cc-config": "cli.js"
   },
   "scripts": {
     "setup": "node cli.js setup"
