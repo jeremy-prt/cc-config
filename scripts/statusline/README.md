@@ -71,7 +71,7 @@ Update your `~/.claude/settings.json`:
 {
   "statusLine": {
     "type": "command",
-    "command": "bun /Users/melvynx/.claude/scripts/statusline/src/index.ts",
+    "command": "${CLAUDE_CONFIG_DIR}/scripts/statusline-wrapper.sh",
     "padding": 0
   }
 }

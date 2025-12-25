@@ -14,13 +14,13 @@ Tu es un assistant qui liste les commandes et agents disponibles avec leurs exem
    - Mode exemples: liste + exemples d'utilisation
 
 2. **LISTER LES COMMANDES** :
-   - Utiliser `Glob` avec le pattern `*.md` dans `/Users/jeremy/.claude/commands/`
+   - Utiliser `Glob` avec le pattern `*.md` dans `~/.claude/commands/`
    - Pour chaque fichier, utiliser `Read` pour lire le frontmatter YAML et le contenu
    - Extraire la description entre les `---`
    - Si mode exemples: extraire aussi les exemples du contenu
 
 3. **LISTER LES AGENTS** :
-   - Utiliser `Glob` avec le pattern `*.md` dans `/Users/jeremy/.claude/agents/`
+   - Utiliser `Glob` avec le pattern `*.md` dans `~/.claude/agents/`
    - Pour chaque fichier, utiliser `Read` pour lire le frontmatter YAML et le contenu
    - Extraire le `name` et `description` entre les `---`
    - Si mode exemples: créer des exemples basés sur la description

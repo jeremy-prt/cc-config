@@ -1,4 +1,8 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
 
 /**
  * Claude Code "Before Tools" Hook - Command Validation Script
@@ -7,7 +11,7 @@
  * It receives command data via stdin and returns exit code 0 (allow) or 1 (block).
  *
  * Usage: Called automatically by Claude Code PreToolUse hook
- * Manual test: echo '{"tool_name":"Bash","tool_input":{"command":"rm -rf /"}}' | bun validate-command.js
+ * Manual test: echo '{"tool_name":"Bash","tool_input":{"command":"rm -rf /"}}' | node validate-command.js
  */
 
 // Comprehensive dangerous command patterns database
@@ -161,10 +165,10 @@ const SECURITY_RULES = {
 
   // Safe paths where rm -rf is allowed
   SAFE_RM_PATHS: [
-    "/Users/melvynx/Developer/",
     "/tmp/",
     "/var/tmp/",
     process.cwd() + "/", // Current working directory
+    // User's home directory subdirectories are checked dynamically
   ],
 };
 
@@ -205,7 +209,8 @@ const SAFE_COMMANDS = [
 
 class CommandValidator {
   constructor() {
-    this.logFile = "/Users/melvynx/.claude/security.log";
+    const homeDir = os.homedir();
+    this.logFile = path.join(homeDir, '.claude', 'security.log');
   }
 
   /**
@@ -533,7 +538,7 @@ class CommandValidator {
   /**
    * Log security events
    */
-  async logSecurityEvent(command, toolName, result, sessionId = null) {
+  logSecurityEvent(command, toolName, result, sessionId = null) {
     const timestamp = new Date().toISOString();
     const logEntry = {
       timestamp,
@@ -549,7 +554,15 @@ class CommandValidator {
     try {
       // Write to log file
       const logLine = JSON.stringify(logEntry) + "\n";
-      await Bun.write(this.logFile, logLine, { createPath: true, flag: "a" });
+
+      // Create directory if it doesn't exist
+      const logDir = path.dirname(this.logFile);
+      if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir, { recursive: true });
+      }
+
+      // Append to log file
+      fs.appendFileSync(this.logFile, logLine, 'utf8');
 
       // Also output to stderr for immediate visibility
       console.error(
@@ -668,7 +681,7 @@ async function main() {
     const result = validator.validate(command, toolName);
 
     // Log the security event
-    await validator.logSecurityEvent(command, toolName, result, sessionId);
+    validator.logSecurityEvent(command, toolName, result, sessionId);
 
     // Output result and exit with appropriate code
     if (result.isValid) {
